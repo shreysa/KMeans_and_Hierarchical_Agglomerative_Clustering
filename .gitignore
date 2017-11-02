@@ -1,0 +1,13 @@
+.idea
+.vscode
+*.class
+target
+project
+spark-warehouse
+metastore_db
+derby.log
+data/
+build.sbt
+.DS_Store
+*.iml
+out/
