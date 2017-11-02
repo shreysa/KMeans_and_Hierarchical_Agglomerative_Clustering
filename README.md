@@ -2,10 +2,7 @@
 ### Assignment A7
 ### Shreysa Sharma and Jashangeet Singh
 
-
 ### Work in progress
-
-
 
 ## Running 
 - Clone the repository
