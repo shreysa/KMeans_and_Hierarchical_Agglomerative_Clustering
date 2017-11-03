@@ -78,7 +78,7 @@ As we are creating 3 clusters, 1 for each category we start with 3 random centro
 
 Approaches used: 
 
-We first prototyped the Hierarchical Agglomerative Clustering (HAC) in python to have a better grip over the algorithm and how exactly it is implemented as we were not very familiar with scala. This was done to analyze where can it be potentially parallelized and get a rough estimate of the time taken on the large dataset. In the Python version that was implemented, code was not optimized and lacked parallelism due to which it failed to run even on the small dataset. We then took around 500 datapoints to check the correctness of the implemented algorithm. The clusters generated are shown in plot 1 and verified that the results looked reasonable. 
+We first prototyped the Hierarchical Agglomerative Clustering (HAC) in python to have a better grip over the algorithm and how exactly it is implemented as we were not very familiar with scala. The code is in file agglomerated_clustering.py. This was done to analyze where can it be potentially parallelized and get a rough estimate of the time taken on the large dataset. In the Python version that was implemented, code was not optimized and lacked parallelism due to which it failed to run even on the small dataset. We then took around 500 datapoints to check the correctness of the implemented algorithm. The clusters generated are shown in plot 1 and verified that the results looked reasonable. 
 
 We then ported the python code to Scala. Following describes the steps:
 
