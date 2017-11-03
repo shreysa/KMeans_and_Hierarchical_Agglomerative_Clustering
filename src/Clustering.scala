@@ -54,8 +54,8 @@ object ClusterMain {
     ClusterTempo(tempoRecords, sc)
     ClusterDuration(durationRecords, sc)
     ClusterHotness(hotnessRecords, sc)
+    ClusterCombHotness(hotnessRecords, sc)
     println(System.currentTimeMillis / 1000 - startTime)
-   // ClusterHotness(hotness, sc, 2)
 
    //Agglomerative Clustering
    val songFileAgglo = sc.textFile(inputFileName, 2).sample(false, 0.005, 314159)
@@ -71,7 +71,8 @@ object ClusterMain {
     var loudnessValues = aggloRecords.zipWithIndex().map(entry => (entry._2, entry._1.getLoudness()))
     var sortedDistances = pairwiseDistances(loudnessValues)
     log.info(s"Number of entries in sorted list = ${sortedDistances.count}")
-
+    println("Building clusters for agglomerative")
+    
     buildClusters(3, loudnessValues, sortedDistances, sc)
   }
 
@@ -80,6 +81,7 @@ object ClusterMain {
       if(line.getLoudness().toDouble > (rand.nextDouble - rand.nextInt(10)))  (1, (line.getLoudness(), -1.0));
       else if(line.getLoudness().toDouble > (rand.nextDouble - rand.nextInt(20))) (2, (line.getLoudness(), -1.0));
       else (3, (line.getLoudness(), -1.0))})
+      println("details for loudness cluster")
       GetClusters(loudness, sc)
   }
 
@@ -88,6 +90,7 @@ object ClusterMain {
       if(line.getTempo().toDouble > (rand.nextDouble + rand.nextInt(250)))  (1, (line.getTempo(), -1.0));
       else if(line.getTempo().toDouble > (rand.nextDouble + rand.nextInt(150))) (2, (line.getTempo(), -1.0));
       else (3, (line.getTempo(), -1.0))})
+      println("details for Tempo cluster")
       GetClusters(tempo, sc)
 
   }
@@ -96,6 +99,7 @@ object ClusterMain {
       if(line.getDuration().toDouble > (rand.nextDouble + rand.nextInt(2800)))  (1, (line.getDuration(), -1.0));
       else if(line.getDuration().toDouble > (rand.nextDouble + rand.nextInt(800))) (2, (line.getDuration(), -1.0));
       else (3, (line.getDuration(), -1.0))})
+       println("details for duration cluster")
       GetClusters(duration, sc)
   }
 
@@ -104,15 +108,40 @@ object ClusterMain {
       if(line.getSongHotness() > rand.nextDouble)  (1, (line.getSongHotness(), -1.0));
       else if(line.getSongHotness() > rand.nextDouble) (2, (line.getSongHotness(), -1.0));
       else (3, (line.getSongHotness(), -1.0))})
+       println("details for song hotness cluster")
       GetClusters(hotness, sc)
   }
 
    def ClusterCombHotness(records: rdd.RDD[Hotness], sc: SparkContext): Unit ={
-    var combHotness = records.map(line => {
-      if(line.getCombHotness()._1 > rand.nextDouble)  (1, (line.getCombHotness(), -1.0));
-      else if(line.getCombHotness()._1 > rand.nextDouble) (2, (line.getCombHotness(), -1.0));
-      else (3, (line.getCombHotness(), -1.0))})
-    //  GetClusters(combHotness, sc)
+    val pairs = records.map(_.getCombHotness)
+    var centroids = pairs.takeSample(false, 3).zipWithIndex
+    for(i <- 0 to 10) {
+      centroids = Cluster2D(pairs,centroids,sc)
+    }
+    // final centroids
+    sc.parallelize(centroids.map(_.productIterator.mkString(","))).saveAsTextFile("output/2d_centroids")
+    records.map(record => {
+      (record.songId, record.getCombHotness, centroids.minBy( r=> {
+        euclideanDistance2D(record.getCombHotness, r._1)
+      })._2)
+    }).map(_.productIterator.mkString(",")).saveAsTextFile("output/2d")
+  }
+
+  def Cluster2D(records: rdd.RDD[(Double, Double)],centroids :Array[((Double, Double), Int)], sc: SparkContext): Array[((Double, Double), Int)] ={
+    val pointsToCluster = records.map(x => 
+      (centroids.minBy( r=> {
+        euclideanDistance2D(x, r._1)
+      })._2, (x, 1))
+    )
+
+    pointsToCluster.reduceByKey((x,y)=> {
+      ((x._1._1 + y._1._1, x._1._2 + y._1._2 ) , x._2+y._2)
+    }).mapValues(value =>  (value._1._1/ value._2, value._1._2/ value._2)).map(_.swap).collect
+    
+  }
+   def euclideanDistance2D(x1: (Double, Double), x2: (Double, Double)): Double = {
+    var square = (x1._1 - x2._1) * (x1._1 - x2._1) + (x1._2 - x2._2)*(x1._2 - x2._2)
+    math.sqrt(square)
   }
 
   def GetClusters(ClusterParameter : rdd.RDD[(Int, (Double, Double))], sc: SparkContext) : Unit = {
@@ -142,12 +171,11 @@ object ClusterMain {
       //centroids parallelize
     }
 
-    // centroids.foreach(av => println("Centroids is : " + av.getValue()))
-    // oldC.foreach(av => println("old Centroid is : " + av.getValue()))
-    // println(param.filter(l => l._1 == 1).count)
-    // println(param.filter(l => l._1 == 2).count)
-    // println(param.filter(l => l._1 == 3).count)
-    // println("Number of iterations done is " + iterations)
+    centroids.foreach(av => println("Centroids is : " + av.getValue()))
+    println("Cluster 1 size is" + param.filter(l => l._1 == 1).count)
+    println("Cluster 2 size is" + param.filter(l => l._1 == 2).count)
+    println("Cluster 3 size is" + param.filter(l => l._1 == 3).count)
+    println("Number of iterations done is " + iterations)
   }
 
 

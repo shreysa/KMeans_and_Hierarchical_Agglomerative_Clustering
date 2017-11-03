@@ -15,7 +15,7 @@ class Hotness(row : String) extends java.io.Serializable {
     var artHotness = 0.00
     var songHotness = 0.00
     var isValidRow = true;
-
+    val songId = line(0)
      try {
       songHotness = line(25).toDouble
       artHotness = line(20).toDouble

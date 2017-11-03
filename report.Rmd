@@ -91,7 +91,11 @@ We then ported the python code to Scala. Following describes the steps:
 
 #### Subproblem 2
 
-
+Steps to find commonality :
+* We first find the distinct similar artist from the similar_artists.csv file.
+* As the artists_terms.csv file has information about the artists and the terms we first create key value pairs with key as   artistId and value as all the terms associated with that artist and join this with the RDD generated previously.
+* Now as each artist has a list of simalr artist list we need to reverse the keys in order to find relationship between all these artists in the second column and the terms.
+* Map to the edges objects after finding the size of the intersection of sets containing artist terms
 
 ## Data Analysis
 
@@ -162,14 +166,32 @@ Plot 3 represents the total time taken by each run in seconds on the small datas
 
 ```{r}
 library(ggplot2)
-spark_run_aws<-read.csv("RunInformation/spark_run_aws.csv")
-ggplot(spark_run_aws, aes(x=Run, y=total_time, color="Total Time")) + 
+spark_run_aws_big<-read.csv("RunInformation/spark_run_aws.csv")
+ggplot(spark_run_aws_big, aes(x=Run, y=total_time, color="Total Time")) + 
   geom_point() +
   ylab("Total Time in seconds") + 
   xlab("Run") + 
-  scale_y_continuous(breaks=seq(109,116,1), limits = c(109, 116)) +
+  scale_y_continuous(breaks=seq(109, 116,1), limits = c(109, 116)) +
   scale_x_continuous(breaks=seq(1,10,1), limits = c(1,10))
+
 ```
 
 Plot 4 represents the total time taken by each run in seconds on the complete dataset when run on AWS. It can be seen from the graph that the values range between 110 to 115 seconds averaging out to 111.5 seconds for 10 runs.
 
+##### Plot 5: Scatter plot for 2000 data points from Agglomerative clustering on big dataset for loudness
+      Data point in each cluster vs loudness value
+      
+      y-axis: loudness score
+      x-axis: row index in the song_info.csv file
+
+```{r}
+
+library(png)
+img <- readPNG("loudnessScatterPlot2000.png", native = TRUE)
+if(exists("rasterImage")){
+      plot(1:2, type='n')
+      rasterImage(img,1,1,2,2)
+}
+
+
+```
