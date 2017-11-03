@@ -64,7 +64,7 @@ object GraphMain {
   }
 
   /**
-    *
+    * Iteratively sets labels and updates centroids until either centroids don'r change or max iterations are reached.
     * @param centroids
     * @param graph
     * @param clusters
@@ -82,7 +82,7 @@ object GraphMain {
   }
 
   /**
-    *
+    * Updates the centroids
     * @param graph
     * @param centroids
     * @param clusters
@@ -93,6 +93,7 @@ object GraphMain {
   }
 
   /**
+    * Sets the Centroid labels on Artist data points. Update happens in clusters array
     * @param clusters Contains the artist_ids with the centroid they are clustered around
     * @param centroids Contains Current centroids
     * @param graph Represents the graph
@@ -139,8 +140,14 @@ object GraphMain {
     }
   }
 
+  /**
+    * Method to find the Data point in a cluster with the max aggregate commonality of it's edges.
+    */
   def getAverage()
 
+  /**
+    * Method return true or false based upon whether the
+    */
   def shouldStop()
 
   /**

@@ -34,10 +34,10 @@ class Edges(aid1: String, aid2: String, cmn: Int) extends java.io.Serializable {
     false
   }
 
-  def compare(c: Array[Edges]): Edges ={
-    for(n <- c){
-      if(n.getComm() != cmnlty)
+  def compare(c: Edges): Boolean ={
+    if (cmnlty > c.getComm())
+      return true
 
-    }
+    false
   }
 }
