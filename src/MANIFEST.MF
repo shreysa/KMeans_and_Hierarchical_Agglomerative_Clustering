@@ -1,1 +1,1 @@
-Main-Class: AgglomerativeCluster
+Main-Class: ClusterMain
