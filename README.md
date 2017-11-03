@@ -17,6 +17,8 @@ The agglomerative clustering prints output to console (However the centroids are
 - `make` this will clean, build, run the program and generate the report
 
 ## Requirements
+
+- library(png), library(ggplot2) are needed to run the report
 - Scala - used version `2.11.11`. *NOTE* using `2.12.4` results in error (`java.lang.NoClassDefFoundError: scala/runtime/LambdaDeserialize`)
 - Apache Spark - used version `spark-2.2.0-bin-hadoop2.7`
 
