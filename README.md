@@ -2,7 +2,10 @@
 ### Assignment A7
 ### Shreysa Sharma and Jashangeet Singh
 
-### Work in progress
+### How to read
+The centroids for each cluster for loudness, duration, tempo and hotness are printed to console.
+The combined hotness details are sent to output folder
+The agglomerative clustering prints output to console (However the centroids are not being calculated)
 
 ## Running 
 - Clone the repository
